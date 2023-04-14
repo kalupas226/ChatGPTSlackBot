@@ -60,7 +60,8 @@ def is_reply_to_chatgpt_bot(channel_id, thread_ts):
     return False
 
 @app.event("message")
-def handle_thread_replies(body, event, say):
+def handle_thread_replies(event, say):
+    say("聞こえているかも")
     if "thread_ts" not in event or "subtype" in event:
         return
 
@@ -68,9 +69,13 @@ def handle_thread_replies(body, event, say):
     thread_ts = event["thread_ts"]
     channel_id = event["channel"]
 
+    say("聞こえてるよ")
+
     if not is_reply_to_chatgpt_bot(channel_id, thread_ts):
         return
     
+    say("きこえてるよ2")
+
     history = thread_histories.get(thread_ts, [])
     history.append({"role": "user", "content": text})
 
