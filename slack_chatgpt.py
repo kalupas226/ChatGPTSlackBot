@@ -19,10 +19,6 @@ def say_hello(message, say):
     user = message['user']
     say(f"Hi there, <@{user}>!")
 
-@app.event("message")
-def handle_message_events(body, logger):
-    logger.info(body)
-
 thread_histories = {}
 
 @app.event("app_mention")
@@ -33,13 +29,11 @@ def handle_mentions(event, say):
     history = thread_histories.get(thread_ts, [])
     history.append({"role": "user", "content": text})
 
-    # メンションされたテキストをChatGPTに送信
     response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=history
     )
 
-    # ChatGPTからの応答をSlackに送信
     message = response.choices[0]["message"]["content"]
     say(message, thread_ts=thread_ts)
 
@@ -53,7 +47,7 @@ def is_reply_to_chatgpt_bot(channel_id, thread_ts):
             ts=thread_ts
         )
         for message in result["messages"]:
-            if os.environ.get("SLACK_BOT_ID") in message:
+            if "bot_id" in message:
                 return True
     except SlackApiError as e:
         print(f"Error: {e}")
@@ -61,20 +55,15 @@ def is_reply_to_chatgpt_bot(channel_id, thread_ts):
 
 @app.event("message")
 def handle_thread_replies(event, say):
-    say("聞こえているかも")
     if "thread_ts" not in event or "subtype" in event:
         return
-
+    
     text = event["text"]
     thread_ts = event["thread_ts"]
     channel_id = event["channel"]
 
-    say("聞こえてるよ")
-
     if not is_reply_to_chatgpt_bot(channel_id, thread_ts):
         return
-    
-    say("きこえてるよ2")
 
     history = thread_histories.get(thread_ts, [])
     history.append({"role": "user", "content": text})
