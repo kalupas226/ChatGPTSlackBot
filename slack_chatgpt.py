@@ -7,7 +7,10 @@ import openai
 openai.api_key = os.environ.get("OPENAI_API_KEY")
 
 # Slackアプリの設定
-app = App(token=os.environ.get("SLACK_BOT_TOKEN"))
+app = App(
+    token=os.environ.get("SLACK_BOT_TOKEN"),
+    signing_secret=os.environ.get("SLACK_SIGNING_SECRET")
+)
 
 @app.message(":wave:")
 def say_hello(message, say):
