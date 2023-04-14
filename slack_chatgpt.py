@@ -1,6 +1,5 @@
 import os
 from slack_bolt import App
-from slack_bolt.adapter.socket_mode import SocketModeHandler
 import openai
 
 # APIキーの設定
@@ -38,6 +37,5 @@ def handle_mentions(event, say):
     say(message)
 
 if __name__ == "__main__":
-    handler = SocketModeHandler(app, os.environ["SLACK_APP_TOKEN"])
-    handler.start()
+    app.start(port=int(os.environ.get("PORT", 3000)))
 
